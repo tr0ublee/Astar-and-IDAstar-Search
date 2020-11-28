@@ -37,7 +37,7 @@ class Node:
         if len(self.children) > 0 :
             print('|'*(self.depth+4), 'Children:')
             for i in range(0,len(self.children)):
-                self.children[i].printObject()
+                self.children[i].printNode()
         else:
             print('|'*(self.depth+4), 'Children : []')
 
@@ -63,39 +63,51 @@ class Node:
         return self.state == GOALVIEW       
 
 def heuristic(state):
-    global GOALINDEX
-    x = len(state[0]) + len(state[1]) + len(state[2]) - len(state[GOALINDEX])
+    global GOALINDEX, N
+    x = N - len(state[GOALINDEX])
     prevIndex = (GOALINDEX - 1) % 3
     nextIndex = (GOALINDEX + 1) % 3
-    smallerArray = []
-    if len(state[prevIndex]) > 0:
-        smallerArray = filter(lambda disk: disk < min(state[prevIndex]), state[GOALINDEX]) 
-        smallerArray = list(smallerArray)
-    if len(state[nextIndex]) > 0:
-        smallerArrayTail = filter(lambda disk: disk < min(state[nextIndex]), state[GOALINDEX])
-        smallerArray = smallerArray + list(smallerArrayTail)
-    y = len(smallerArray)
+    y  = 0 
+    currentDisk = N
+    rodBottomPtr = 0
+    goalLen = len(state[GOALINDEX])
+    # '''
+    while currentDisk > 0 and rodBottomPtr < goalLen:
+        if state[GOALINDEX][rodBottomPtr] < currentDisk: 
+            '''
+                if the biggest element in the rod is smaller than an element in another rod, then all the remaining 
+                ones will also be smaller
+            '''
+            y += len(state[GOALINDEX][rodBottomPtr:])
+            break
+        rodBottomPtr += 1
+        currentDisk -= 1
+  
+
     return x + 2*y
 
 def readInput():
     global METHOD, M, N, GOAL, A, B, C, GOALINDEX, GOALVIEW
     METHOD = input()
     M = int(input())
-    N = input()
+    N = int(input())
     GOAL = input()
     A = input()
     B = input()
     C = input()
     if A != '':
-        A = A.split(',') 
+        A = A.split(',')
+        A = list(map(lambda item: int(item),A))
     else:
          A = []
     if B != '':
         B = B.split(',') 
+        B = list(map(lambda item: int(item),B))
     else:
         B = []
     if C != '':
         C = C.split(',') 
+        C = list(map(lambda item: int(item),C))
     else:
         C = []
     if GOAL == 'A':
@@ -213,8 +225,6 @@ def __main__():
     else:
         print('SUCCESS')
         for i in result:
-            # outText = "\nA->{a}\tB->{b}\tC->{c}\n"
-            outText = "A->{a}\tB->{b}\tC->{c}\n"
-            outText = outText.format(a = i[0], b = i[1], c = i[2])
+            outText = "\nA->{a}\tB->{b}\tC->{c}\n".format(a = i[0], b = i[1], c = i[2])
             print(outText)
 __main__()
