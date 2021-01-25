@@ -1,1 +1,1 @@
-# CENG462---Artifical-Intelligence
+# Implementation of A* and IDA*
